@@ -13,8 +13,10 @@ contract Airdrop {
     address token_wallet;
 
     // example value
+    uint128 constant tokensBack_required_value = 2 ton;
     uint128 constant deploy_wallet_grams = 0.2 ton;
     uint128 constant transfer_grams = 0.5 ton;
+    
 
     mapping(address => uint128) receivers;
 
@@ -69,19 +71,19 @@ contract Airdrop {
 
     function getTokensBack(uint128 amount) external view {
         require(receivers.exists(msg.sender) && amount <= receivers[msg.sender], 104);
-        tvm.accept();
+        
+        tvm.rawReserve(address(this).balance - msg.value, 2);
+        require(msg.value >= tokensBack_required_value, 105);
 
-        TvmCell empty;
-
+        
         // Transfer tokens
-        ITONTokenWallet(token_wallet).transferToRecipient{
+        TvmCell empty;
+        ITONTokenWallet(token_wallet).transfer{
             value: 0,
             flag: MsgFlag.ALL_NOT_RESERVED
         }(
-            0,
             msg.sender,
             amount,
-            deploy_wallet_grams,
             transfer_grams,
             msg.sender,
             false,
