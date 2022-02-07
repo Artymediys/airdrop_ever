@@ -18,7 +18,7 @@ contract Airdrop {
     uint128 constant transfer_grams = 0.5 ton;
     
 
-    mapping(address => uint128) receivers;
+    mapping(address => uint128) public receivers;
 
     uint128 transferred_count = 0;
 
